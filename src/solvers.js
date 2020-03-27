@@ -13,6 +13,77 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
+// Helper functions
+// Given a position where a piece is inserted, mark all positions that become 'dangerous' to subsequent pieces
+// mark column as taken by inserted piece
+window.markCol = function (board, n, row, col) {
+  for (var i = 0; i < n; i++) {
+    if (i !== row) {
+      board[i][col]--;
+    }
+  }
+  return board;
+}
+// mark row as taken by inserted piece
+window.markRow = function (board, n, row, col) {
+  for (var j = 0; j < n; j++) {
+    if (j !== col) {
+      board[row][j]--;
+    }
+  }
+  return board;
+}
+// mark diagonals as taken by piece
+window.markMajorDiags = function (board, n, row, col) {
+  var i = 1;
+  while ((col + i < n) && (row + i < n)) {
+    board[row + i][col + i]--;
+    i++;
+  }
+  i = 1;
+  while ((col - i >= 0) && (row - i >= 0)) {
+    board[row - i][col - i]--;
+    i++;
+  }
+  return board;
+}
+
+window.markMinorDiags = function (board, n, row, col) {
+  var i = 1;
+  while ((col + i < n) && (row - i >= 0)) {
+    board[row - i][col + i]--;
+    i++;
+  }
+  i = 1;
+  while ((col - i >= 0) && (row + i < n)) {
+    board[row + i][col - i]--;
+    i++;
+  }
+  return board;
+}
+
+window.markDiags = function (board, n, row, col) {
+  board = window.markMajorDiags(board, n, row, col);
+  board = window.markMinorDiags(board, n, row, col);
+  return board;
+}
+
+window.markDangerous = function(board, n, insertedPieceRowInd, insertedPieceColInd, insertedPiece = null) {
+  // inserttedPiece : if passed 'Q', it will mark diagonals, else, mark only row and column
+  board = window.markRow(board, n, insertedPieceRowInd, insertedPieceColInd);
+  board = window.markCol(board, n, insertedPieceRowInd, insertedPieceColInd);
+  if (insertedPiece == 'Q') {
+    board = window.markDiags(board, n, insertedPieceRowInd, insertedPieceColInd);
+  }
+  return board;
+}
+
+// Adding a piece to the board
+window.placePiece = function(board, n, pieceRow, pieceCol, insertedPiece = null) {
+  board[pieceRow][pieceCol] += n+1;
+  board = window.markDangerous(board, n, pieceRow, pieceCol, insertedPiece);
+  return board;
+}
 
 
 window.findNRooksSolution = function(n) {
