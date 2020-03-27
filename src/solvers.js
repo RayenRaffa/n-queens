@@ -4,7 +4,7 @@
   \__ \ (_) | |\ V /  __/ |  \__ \
   |___/\___/|_| \_/ \___|_|  |___/
 
-*/
+  */
 
 // hint: you'll need to do a full-search of all possible arrangements of pieces!
 // (There are also optimizations that will allow you to skip a lot of the dead search space)
@@ -80,14 +80,37 @@ window.markDangerous = function(board, n, insertedPieceRowInd, insertedPieceColI
 
 // Adding a piece to the board
 window.placePiece = function(board, n, pieceRow, pieceCol, insertedPiece = null) {
-  board[pieceRow][pieceCol] += n+1;
+  board[pieceRow][pieceCol] = 1;
   board = window.markDangerous(board, n, pieceRow, pieceCol, insertedPiece);
   return board;
 }
 
 
-window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+window.findNRooksSolution = function(n, node, col = 0) {
+  var solution = undefined; //fixme 
+  if (!node) {
+    var emptyMatrix = _(_.range(n)).map(function() {
+      return _(_.range(n)).map(function() {
+        return 0;
+      });
+    });
+    node = new BoardTree(emptyMatrix);
+  }
+  
+  if (col < n) {
+    for (var i = 0; i < n; i++) {
+      if (node.board[i][col] === 0) {
+        newBoard = placePiece(node.board, n, i, col);
+        newNode = new BoardTree(newBoard);
+        node.addNode(newNode, col === n-1)
+        if (newNode.isSolution) {
+          return newNode.board;
+        } else {
+          findNRooksSolution(n, newNode, col + 1);
+        }
+      }
+    }
+  }  
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -116,3 +139,14 @@ window.countNQueensSolutions = function(n) {
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
+
+class BoardTree  {
+  constructor (board, isSolution = false) {
+    this.board = board;
+    this.children = [];
+    this.isSolution = isSolution;
+  }
+  addNode (node) {
+    this.children.push(node);
+  }
+}

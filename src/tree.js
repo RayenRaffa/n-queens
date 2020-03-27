@@ -1,22 +1,10 @@
-class Tree {
-    constructor (value) {
-        this.value = value;
+class BoardTree  {
+    constructor (board, isSolution = false) {
+        this.board = board;
         this.children = [];
-        // this.parent = parent;
+        this.isSolution = isSolution;
     }
-
-    addNode (board) {
-        this.children.push(new Tree(board));
+    addNode (node) {
+        this.children.push(node);
     }
-}
-
-class BoardTree extends Tree {
-    constructor (value) {
-        super(value);
-        this.isSolution = false;
-    }
-    addNode (board) {
-        this.children.push(new BoardTree(board))
-    }
-    
 }
